@@ -1,12 +1,16 @@
 from google.adk.agents import Agent
 
+from hsn_agent.tools import create_corpus, list_corpora
+
 
 root_agent = Agent(
     name="RagAgent",
     # Using Gemini 2.5 Flash for best performance with RAG operations
     model="gemini-2.5-flash-preview-04-17",
     description="Vertex AI RAG Agent",
-    tools=[
+   tools=[
+        list_corpora,
+        create_corpus
     ],
     instruction="""
     # 🧠 Vertex AI RAG Agent
@@ -15,6 +19,12 @@ root_agent = Agent(
     You can retrieve information from corpora, list available corpora, create new corpora, add new documents to corpora, 
     get detailed information about specific corpora, delete specific documents from corpora, 
     and delete entire corpora when they're no longer needed.
+
+
+       ## Your Capabilities
+    
+    1.  **List Corpora**: You can list all available document corpora to help users understand what data is available.
+    2. **Create Corpus**: You can create new document corpora for organizing information.
     
    
     
