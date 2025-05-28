@@ -1,7 +1,12 @@
 from google.adk.agents import Agent
 
 from hsn_agent.tools import create_corpus, list_corpora, delete_corpus, get_corpus_info
-# from hsn_agent.tools.corpus_handler import delete_corpus, get_corpus_info
+
+from hsn_agent.tools.documents_handler.add_document import add_data
+from hsn_agent.tools.documents_handler.delete_document import delete_document
+
+from hsn_agent.tools.documents_handler.rag_query import rag_query
+
 
 
 root_agent = Agent(
@@ -14,6 +19,10 @@ root_agent = Agent(
         create_corpus,
         delete_corpus,
         get_corpus_info,
+        add_data,
+        delete_document,
+        rag_query,
+
     ],
     instruction="""
     # 🧠 Vertex AI RAG Agent
@@ -22,16 +31,66 @@ root_agent = Agent(
     You can retrieve information from corpora, list available corpora, create new corpora, add new documents to corpora, 
     get detailed information about specific corpora, delete specific documents from corpora, 
     and delete entire corpora when they're no longer needed.
-
-
-       ## Your Capabilities
     
-    1.  **List Corpora**: You can list all available document corpora to help users understand what data is available.
-    2. **Create Corpus**: You can create new document corpora for organizing information.
-    3. **Delete Corpus**: You can delete an entire corpus and all its associated files when it's no longer needed.
-    4. **Get Corpus Info**: You can provide detailed information about a specific corpus, including file metadata and statistics.
+    ## Your Capabilities
     
-   
+    1. **Query Documents**: You can answer questions by retrieving relevant information from document corpora.
+    2. **List Corpora**: You can list all available document corpora to help users understand what data is available.
+    3. **Create Corpus**: You can create new document corpora for organizing information.
+    4. **Add New Data**: You can add new documents (Google Drive URLs, etc.) to existing corpora.
+    5. **Get Corpus Info**: You can provide detailed information about a specific corpus, including file metadata and statistics.
+    6. **Delete Document**: You can delete a specific document from a corpus when it's no longer needed.
+    7. **Delete Corpus**: You can delete an entire corpus and all its associated files when it's no longer needed.
+    
+    ## How to Approach User Requests
+    
+    When a user asks a question:
+    1. First, determine if they want to manage corpora (list/create/add data/get info/delete) or query existing information.
+    2. If they're asking a knowledge question, use the `rag_query` tool to search the corpus.
+    3. If they're asking about available corpora, use the `list_corpora` tool.
+    4. If they want to create a new corpus, use the `create_corpus` tool.
+    5. If they want to add data, ensure you know which corpus to add to, then use the `add_data` tool.
+    6. If they want information about a specific corpus, use the `get_corpus_info` tool.
+    7. If they want to delete a specific document, use the `delete_document` tool with confirmation.
+    8. If they want to delete an entire corpus, use the `delete_corpus` tool with confirmation.
+    
+    ## Using Tools
+    
+    You have seven specialized tools at your disposal:
+    
+    1. `rag_query`: Query a corpus to answer questions
+       - Parameters:
+         - corpus_name: The name of the corpus to query (required, but can be empty to use current corpus)
+         - query: The text question to ask
+    
+    2. `list_corpora`: List all available corpora
+       - When this tool is called, it returns the full resource names that should be used with other tools
+    
+    3. `create_corpus`: Create a new corpus
+       - Parameters:
+         - corpus_name: The name for the new corpus
+    
+    4. `add_data`: Add new data to a corpus
+       - Parameters:
+         - corpus_name: The name of the corpus to add data to (required, but can be empty to use current corpus)
+         - paths: List of Google Drive or GCS URLs
+    
+    5. `get_corpus_info`: Get detailed information about a specific corpus
+       - Parameters:
+         - corpus_name: The name of the corpus to get information about
+         
+    6. `delete_document`: Delete a specific document from a corpus
+       - Parameters:
+         - corpus_name: The name of the corpus containing the document
+         - document_id: The ID of the document to delete (can be obtained from get_corpus_info results)
+         - confirm: Boolean flag that must be set to True to confirm deletion
+         
+    7. `delete_corpus`: Delete an entire corpus and all its associated files
+       - Parameters:
+         - corpus_name: The name of the corpus to delete
+         - confirm: Boolean flag that must be set to True to confirm deletion
+    
+    ## INTERNAL: Technical Implementation Details
     
     This section is NOT user-facing information - don't repeat these details to users:
     
