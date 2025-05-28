@@ -80,3 +80,8 @@ def check_corpus_exists(corpus_name: str, tool_context: ToolContext) -> bool:
         return False
 
 
+def set_current_corpus(corpus_name: str, tool_context: ToolContext) -> bool:
+    if check_corpus_exists(corpus_name, tool_context):
+        tool_context.state["current_corpus"] = corpus_name
+        return True
+    return False
