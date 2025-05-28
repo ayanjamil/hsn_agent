@@ -1,7 +1,10 @@
 from google.adk.agents import Agent
 
 from hsn_agent.tools import create_corpus, list_corpora, delete_corpus, get_corpus_info
-# from hsn_agent.tools.corpus_handler import delete_corpus, get_corpus_info
+
+from hsn_agent.tools.documents_handler.add_document import add_data
+from hsn_agent.tools.documents_handler.delete_document import delete_document
+
 
 
 root_agent = Agent(
@@ -14,6 +17,9 @@ root_agent = Agent(
         create_corpus,
         delete_corpus,
         get_corpus_info,
+        add_data,
+        delete_document
+
     ],
     instruction="""
     # 🧠 Vertex AI RAG Agent
@@ -30,6 +36,10 @@ root_agent = Agent(
     2. **Create Corpus**: You can create new document corpora for organizing information.
     3. **Delete Corpus**: You can delete an entire corpus and all its associated files when it's no longer needed.
     4. **Get Corpus Info**: You can provide detailed information about a specific corpus, including file metadata and statistics.
+    5. **Add New Data**: You can add new documents (Google Drive URLs, etc.) to existing corpora.
+    6. **Delete Document**: You can delete a specific document from a corpus when it's no longer needed.
+
+
     
    
     
