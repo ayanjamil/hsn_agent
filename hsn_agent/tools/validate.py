@@ -9,7 +9,7 @@ def validate_hsn_code(
     tool_context: ToolContext
 ) -> Dict[str, object]:
     if "hsn_table" not in tool_context.state:
-        load_hsn_master(path="data/master_hsn.csv", tool_context=tool_context)
+        load_hsn_master(path="hsn_agent/data/master_hsn.csv", tool_context=tool_context)
     hsn_table = tool_context.state.get("hsn_table", {})
 
     if not hsn_table:
