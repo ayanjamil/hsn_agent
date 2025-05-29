@@ -1,15 +1,16 @@
-import re
 import logging
+import re
+
 from google.adk.tools.tool_context import ToolContext
 from vertexai import rag
+
+from hsn_agent.tools.load_hsn_master import load_hsn_master
 
 from ...config import (
     DEFAULT_DISTANCE_THRESHOLD,
     DEFAULT_TOP_K,
 )
 from ..utils import check_corpus_exists, get_corpus_resource_name
-from ..load_hsn_master import load_hsn_master
-
 
 def rag_query(
     corpus_name: str,
@@ -26,26 +27,46 @@ def rag_query(
 
     if hsn_table and (m_end or m_start or m_contains):
         if m_end:
-            pattern = m_end.group(1)
-            mode = "ends with"
-            matches = [c for c in hsn_table if c.endswith(pattern)]
+            pattern, mode = m_end.group(1), "ends with"
         elif m_start:
-            pattern = m_start.group(1)
-            mode = "begins with"
+            pattern, mode = m_start.group(1), "begins with"
+        else:
+            pattern, mode = m_contains.group(1), "contains"
+
+        if mode == "ends with":
+            matches = [c for c in hsn_table if c.endswith(pattern)]
+        elif mode == "begins with":
             matches = [c for c in hsn_table if c.startswith(pattern)]
         else:
-            pattern = m_contains.group(1)
-            mode = "contains"
             matches = [c for c in hsn_table if pattern in c]
 
-        suggestions = [
-            {"code": c, "description": hsn_table[c]}
-            for c in matches[:5]
-        ]
+        suggestions = []
+        for code in matches[:5]:
+            desc = hsn_table[code]
+            entry = {"code": code, "description": desc}
+            if desc.strip().upper() == "OTHER":
+                for length in (6, 4, 2):
+                    if len(code) >= length:
+                        parent = code[:length]
+                        pdesc = hsn_table.get(parent, "").strip()
+                        if pdesc and pdesc.upper() != "OTHER":
+                            entry["explanation"] = (
+                                f"This 'OTHER' is the catch‐all category under '{pdesc}'."
+                            )
+                            break
+            suggestions.append(entry)
+
         if suggestions:
+            lines = []
+            for s in suggestions:
+                line = f"- {s['code']}: {s['description']}"
+                if "explanation" in s:
+                    line += f" — {s['explanation']}"
+                lines.append(line)
+
             prompt = (
                 f"I found these HSN codes that {mode} '{pattern}':\n"
-                + "\n".join(f"- {s['code']}: {s['description']}" for s in suggestions)
+                + "\n".join(lines)
                 + "\n\nDo any of these look right? Or tell me more about the product/service."
             )
             return {
@@ -54,7 +75,7 @@ def rag_query(
                 "pattern": pattern,
                 "mode": mode,
                 "suggestions": suggestions,
-                "message": prompt
+                "message": prompt,
             }
         else:
             return {
@@ -63,36 +84,41 @@ def rag_query(
                 "message": f"No HSN codes {mode} '{pattern}' were found in the master list."
             }
 
-    # --- 3) Fallback to normal RAG corpus lookup ---
+    # --- fallback to standard RAG retrieval ---
     try:
+
         if not check_corpus_exists(corpus_name, tool_context):
             return {
                 "status": "error",
-                "message": f"Corpus '{corpus_name}' does not exist. Please create it first.",
+                "message": f"Corpus '{corpus_name}' does not exist. Please create it first using the create_corpus tool.",
                 "query": query,
                 "corpus_name": corpus_name,
             }
 
         corpus_resource_name = get_corpus_resource_name(corpus_name)
-        cfg = rag.RagRetrievalConfig(
+        rag_retrieval_config = rag.RagRetrievalConfig(
             top_k=DEFAULT_TOP_K,
             filter=rag.Filter(vector_distance_threshold=DEFAULT_DISTANCE_THRESHOLD),
         )
-
         response = rag.retrieval_query(
-            rag_resources=[rag.RagResource(rag_corpus=corpus_resource_name)],
+            rag_resources=[
+                rag.RagResource(
+                    rag_corpus=corpus_resource_name,
+                )
+            ],
             text=query,
-            rag_retrieval_config=cfg,
+            rag_retrieval_config=rag_retrieval_config,
         )
 
-        results = []
-        for ctxg in getattr(response.contexts, "contexts", []):
-            results.append({
-                "source_uri": getattr(ctxg, "source_uri", ""),
-                "source_name": getattr(ctxg, "source_display_name", ""),
-                "text": getattr(ctxg, "text", ""),
-                "score": getattr(ctxg, "score", 0.0),
-            })
+        results = [
+            {
+                "source_uri": getattr(c, "source_uri", ""),
+                "source_name": getattr(c, "source_display_name", ""),
+                "text": getattr(c, "text", ""),
+                "score": getattr(c, "score", 0.0),
+            }
+            for c in getattr(response.contexts, "contexts", [])
+        ]
 
         if not results:
             return {
@@ -114,10 +140,11 @@ def rag_query(
         }
 
     except Exception as e:
-        logging.error(f"Error querying corpus: {e}")
+        error_msg = f"Error querying corpus: {str(e)}"
+        logging.error(error_msg)
         return {
             "status": "error",
-            "message": f"Error querying corpus: {e}",
+            "message": error_msg,
             "query": query,
             "corpus_name": corpus_name,
         }
