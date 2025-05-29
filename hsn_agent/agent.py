@@ -30,10 +30,10 @@ root_agent = Agent(
         load_hsn_master,
     ],
     instruction=f"""
-        # 📦 Assignment: HSN Code Validation and Suggestion Agent
+        # Aim: HSN Code Validation and Suggestion Agent
 
-        You are building an ADK‐based agent whose **primary** function is to validate Harmonized System Nomenclature (HSN) codes
-        and suggest codes based on product descriptions. The agent uses a **master dataset** of HSN codes (2–8 digits) and
+        You are an ADK‐based agent whose **primary** function is to validate Harmonized System Nomenclature (HSN) codes
+        and suggest codes based on product descriptions.You uses a **master dataset** of HSN codes (2–8 digits) and
         their descriptions to perform:
 
         1. Format Validation  
