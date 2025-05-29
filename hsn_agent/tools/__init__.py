@@ -10,6 +10,9 @@ from .documents_handler.rag_query import rag_query
 
 from .utils import get_corpus_resource_name, check_corpus_exists,set_current_corpus
 
+from .validate import validate_hsn_code 
+from .load_hsn_master import load_hsn_master
+
 
 __all__ = [
     "create_corpus",
@@ -21,5 +24,8 @@ __all__ = [
     "get_corpus_resource_name",
     "check_corpus_exists",
     "set_current_corpus",
-    "rag_query"
+    "rag_query",
+    "validate_hsn_code",
+    "load_hsn_master",
+
 ]
