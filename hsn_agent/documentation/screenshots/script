@@ -1,0 +1,118 @@
+#!/bin/bash
+
+# Script to normalize screenshot filenames for better GitHub compatibility
+# This script will:
+# 1. Replace spaces with underscores
+# 2. Remove special characters
+# 3. Convert to lowercase
+# 4. Keep only alphanumeric characters, underscores, hyphens, and dots
+
+# Set the screenshots directory path
+SCREENSHOTS_DIR="screenshots"
+
+# Check if directory exists
+if [ ! -d "$SCREENSHOTS_DIR" ]; then
+    echo "Error: Directory $SCREENSHOTS_DIR does not exist!"
+    echo "Please make sure you're running this script from the repository root."
+    exit 1
+fi
+
+echo "🔄 Normalizing screenshot filenames in $SCREENSHOTS_DIR..."
+echo "----------------------------------------"
+
+# Counter for renamed files
+renamed_count=0
+
+# Function to normalize filename
+normalize_filename() {
+    local filename="$1"
+    local extension="${filename##*.}"
+    local basename="${filename%.*}"
+    
+    # Convert to lowercase, replace spaces with underscores, remove special chars
+    local normalized=$(echo "$basename" | \
+        tr '[:upper:]' '[:lower:]' | \
+        sed 's/[[:space:]]\+/_/g' | \
+        sed 's/[^a-zA-Z0-9._-]//g' | \
+        sed 's/__*/_/g' | \
+        sed 's/^_\|_$//g')
+    
+    echo "${normalized}.${extension,,}"
+}
+
+# Create a mapping file to track old -> new names
+MAPPING_FILE="filename_mapping.txt"
+echo "# Filename mapping (old -> new)" > "$MAPPING_FILE"
+echo "# Generated on $(date)" >> "$MAPPING_FILE"
+echo "" >> "$MAPPING_FILE"
+
+# Process each file in the screenshots directory
+for file in "$SCREENSHOTS_DIR"/*; do
+    # Skip if not a file
+    [ ! -f "$file" ] && continue
+    
+    # Get just the filename without path
+    original_filename=$(basename "$file")
+    
+    # Skip if already normalized (contains only lowercase, numbers, underscores, hyphens, dots)
+    if [[ "$original_filename" =~ ^[a-z0-9._-]+$ ]]; then
+        echo "✅ Already normalized: $original_filename"
+        continue
+    fi
+    
+    # Generate normalized filename
+    normalized_filename=$(normalize_filename "$original_filename")
+    
+    # Skip if normalized name would be the same
+    if [ "$original_filename" = "$normalized_filename" ]; then
+        echo "✅ No change needed: $original_filename"
+        continue
+    fi
+    
+    # Check if target filename already exists
+    if [ -f "$SCREENSHOTS_DIR/$normalized_filename" ]; then
+        echo "⚠️  Warning: Target filename already exists: $normalized_filename"
+        echo "   Skipping: $original_filename"
+        continue
+    fi
+    
+    # Rename the file
+    mv "$SCREENSHOTS_DIR/$original_filename" "$SCREENSHOTS_DIR/$normalized_filename"
+    
+    if [ $? -eq 0 ]; then
+        echo "✅ Renamed: $original_filename -> $normalized_filename"
+        echo "$original_filename -> $normalized_filename" >> "$MAPPING_FILE"
+        ((renamed_count++))
+    else
+        echo "❌ Failed to rename: $original_filename"
+    fi
+done
+
+echo ""
+echo "----------------------------------------"
+echo "🎉 Normalization complete!"
+echo "📊 Files renamed: $renamed_count"
+echo "📄 Mapping saved to: $MAPPING_FILE"
+
+if [ $renamed_count -gt 0 ]; then
+    echo ""
+    echo "📝 Next steps:"
+    echo "1. Update your documentation to use the new filenames"
+    echo "2. Commit the renamed files to git"
+    echo "3. Update any references in README.md or other docs"
+    echo ""
+    echo "💡 New normalized filenames:"
+    echo "----------------------------------------"
+    ls -1 "$SCREENSHOTS_DIR" | grep -E '\.(png|jpg|jpeg|gif|webp)$' | sort
+fi
+
+echo ""
+echo "🔗 Updated image paths for documentation:"
+echo "----------------------------------------"
+counter=1
+for file in "$SCREENSHOTS_DIR"/*.{png,jpg,jpeg,gif,webp} 2>/dev/null; do
+    [ ! -f "$file" ] && continue
+    filename=$(basename "$file")
+    echo "![Screenshot $counter](documentation/screenshots/$filename)"
+    ((counter++))
+done

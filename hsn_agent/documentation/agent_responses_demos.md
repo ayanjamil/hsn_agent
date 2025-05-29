@@ -14,9 +14,9 @@ The agent can handle complex queries requesting HSN codes for multiple different
 
 **Example Query**: _"I want two code one for horse for games and other for horse meat"_
 
-**Agent Response**:
+![Multi-Product Query Handling](hsn_agent/documentation/screenshots/1.multi-product_query_handling.png)
 
-![Multi-Product Query Handling](hsn_agent/documentation/screenshots/1.Multi-Product%20Query%20Handling.png)
+**Agent Response**:
 
 - **For "horse for games"**:
 
@@ -39,7 +39,7 @@ The agent can find HSN codes based on partial patterns, such as codes ending wit
 
 **Example Query**: _"I dont remember the exact hsn code but it had 99 in between"_
 
-![Pattern-Based Code Search](hsn_agent/documentation/screenshots/2.Pattern-Based%20Code%20Search.png)
+![Pattern-Based Code Search](documentation/screenshots/02_pattern_based_code_search.png)
 
 **Agent Response**: The agent found HSN codes containing '99':
 
@@ -59,7 +59,7 @@ The agent provides instant validation for specific HSN codes with complete hiera
 
 **Example Query**: _"33012912"_
 
-![Direct Code Validation](hsn_agent/documentation/screenshots/3.Direct%20Code%20Validation.png)
+![Direct Code Validation](documentation/screenshots/03_direct_code_validation.png)
 
 **Agent Response**:
 
@@ -81,7 +81,7 @@ The agent includes comprehensive administrative capabilities for corpus manageme
 
 **Example Interaction**: _"admin: list all corpus"_
 
-![Administrative Functions](hsn_agent/documentation/screenshots/4.Administrative%20Functions.png)
+![Administrative Functions](documentation/screenshots/04_administrative_functions.png)
 
 **Agent Capabilities**:
 
@@ -100,7 +100,7 @@ The agent can find codes ending with specific digit patterns.
 
 **Example Query**: _"it ends with 1223"_
 
-![Advanced Pattern Matching](hsn_agent/documentation/screenshots/5.Advanced%20Pattern%20Matching.png)
+![Advanced Pattern Matching](documentation/screenshots/05_advanced_pattern_matching.png)
 
 **Agent Response**:
 
@@ -117,7 +117,7 @@ When exact patterns aren't found, the agent provides closest matches and helpful
 
 **Example Query**: _"i cant remember the hsn code but i remember it ends with 333"_
 
-![Flexible Pattern Search](hsn_agent/documentation/screenshots/6.Flexible%20Pattern%20Search.png)
+![Flexible Pattern Search](documentation/screenshots/06_flexible_pattern_search.png)
 
 **Agent Response**:
 
@@ -134,7 +134,7 @@ The agent can suggest multiple related codes when an exact match isn't found.
 
 **Example Query**: _"112"_
 
-![Code Suggestion with Context](hsn_agent/documentation/screenshots/7.Code%20Suggestion%20with%20Context.png)
+![Code Suggestion with Context](documentation/screenshots/07_code_suggestion_with_context.png)
 
 **Agent Response** (when code "112" is not valid): Suggested related codes:
 
@@ -154,7 +154,7 @@ The agent can validate multiple HSN codes simultaneously with detailed hierarchi
 
 **Example Query**: _"03029910, 030312, 05119929 and 09042110"_
 
-![Multi-Code Validation](hsn_agent/documentation/screenshots/8.Multi-Code%20Validation.png)
+![Multi-Code Validation](documentation/screenshots/08_multi_code_validation.png)
 
 **Agent Response**: Detailed validation for each code:
 
@@ -173,7 +173,7 @@ The agent excels at understanding natural language descriptions and finding rele
 
 **Example Query**: _"shark have a feature on their body i want the code for that"_
 
-![Natural Language Product Queries](hsn_agent/documentation/screenshots/9.Natural%20Language%20Product%20Queries.png)
+![Natural Language Product Queries](documentation/screenshots/09_natural_language_product_queries.png)
 
 **Agent Response**: Shark-related HSN codes:
 
@@ -197,7 +197,7 @@ When faced with ambiguous queries, the agent provides context and asks for clari
 
 **Example Query**: _"1234"_ → Follow-up: _"yes it is related to wood"_
 
-![Contextual Code Resolution](hsn_agent/documentation/screenshots/10.Contextual%20Code%20Resolution.png)
+![Contextual Code Resolution](documentation/screenshots/10_contextual_code_resolution.png)
 
 **Agent Response**: After clarification, the agent found:
 
@@ -217,7 +217,7 @@ The agent can provide exact HSN codes for specific products with high accuracy.
 
 **Example Query**: _"what is the hsn code for horse in polo"_
 
-![Specific Product Identification](hsn_agent/documentation/screenshots/11.Specific%20Product%20Identification.png)
+![Specific Product Identification](documentation/screenshots/11_specific_product_identification.png)
 
 **Agent Response**:
 
@@ -233,7 +233,7 @@ The agent can handle queries for specialized or unique products.
 
 **Example Query**: _"what is the hsn code for spaceship"_
 
-![Specialized Product Categories](hsn_agent/documentation/screenshots/12.Specialized%20Product%20Categories.png)
+![Specialized Product Categories](documentation/screenshots/12_specialized_product_categories.png)
 
 **Agent Response**:
 
@@ -249,7 +249,7 @@ The agent can interpret creative or fictional product queries and provide releva
 
 **Example Query**: _"what is for hsn code flying mermaid"_
 
-![Creative Product Interpretation](hsn_agent/documentation/screenshots/13.Creative%20Product%20Interpretation.png)
+![Creative Product Interpretation](documentation/screenshots/13_creative_product_interpretation.png)
 
 **Agent Response**: The agent recognized this as a fantastical item and suggested:
 
@@ -266,7 +266,7 @@ The agent appropriately handles queries for non-existent products while providin
 
 **Example Query**: _"what is the hsn code for dragon meat"_
 
-![Mythical Product Handling](hsn_agent/documentation/screenshots/14.Mythical%20Product%20Handling.png)
+![Mythical Product Handling](documentation/screenshots/14_mythical_product_handling.png)
 
 **Agent Response**: The agent explained that dragons are mythical, but provided meat-related codes:
 
