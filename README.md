@@ -85,6 +85,11 @@ graph TD
 
 > **Note**: The current implementation supports adding documents to the RAG system for enhanced semantic queries. However, the CSV validation database cannot be updated through the current codebase - this requires manual file updates.
 
+### Feedback (future implementation approach)
+
+- We can have the agent ask for feedback score 1-10 after each conversation and store it in database corrosponing to the chart id, and then use llm for analysing the top rated charts by the user for our understanding how to make conversation agent better.
+- We can also do a sentiment analysis of the charts in out database, if we don't have to take input from the user.
+
 ## 🛠️ Technology Stack
 
 - **Language**: Python 3.9+
