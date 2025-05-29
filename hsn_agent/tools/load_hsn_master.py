@@ -1,41 +1,54 @@
-# hsn_agent/tools/load_hsn_master.py
-
+import os
 import pandas as pd
 from pandas.errors import ParserError
 from google.adk.tools.tool_context import ToolContext
-# from google.adk.tools import FunctionTool
 
 def load_hsn_master(path: str, tool_context: ToolContext) -> dict:
     """
-    Reads the HSN_Master CSV (or Excel) at `path`, normalizes the headers,
-    builds a dict of code→description, and stores it in tool_context.state["hsn_table"].
+    Reads the HSN master file at `path` (CSV or XLSX), 
+    normalizes headers, builds a dict code→description, 
+    and stores it in tool_context.state["hsn_table"].
     """
-    # 1) Read with comma first, else try tab
-    try:
-        df = pd.read_csv(path, dtype=str)
-    except ParserError:
-        df = pd.read_csv(path, sep="\t", dtype=str)
+    # 1) Check file exists
+    if not os.path.isfile(path):
+        return {"status": "error", "message": f"File not found: {path}"}
 
-    # 2) Clean column names of extra quotes/whitespace
+    # 2) Read into DataFrame
+    ext = os.path.splitext(path)[1].lower()
+    try:
+        if ext in (".xls", ".xlsx"):
+            df = pd.read_excel(path, dtype=str)
+        else:
+            df = pd.read_csv(path, dtype=str)
+    except ParserError:
+        # Retry with tabs
+        try:
+            df = pd.read_csv(path, sep="\t", dtype=str)
+        except Exception as e:
+            return {"status": "error", "message": f"Failed to parse {path}: {e}"}
+    except Exception as e:
+        return {"status": "error", "message": f"Error loading {path}: {e}"}
+
+    # 3) Normalize column names
     df.columns = df.columns.str.strip().str.strip('"').str.strip("'")
 
-    # 3) Validate columns exist
-    expected = {"HSNCode", "Description"}
-    if not expected.issubset(set(df.columns)):
+    # 4) Validate required columns
+    required = {"HSNCode", "Description"}
+    missing = required - set(df.columns)
+    if missing:
         return {
             "status": "error",
-            "message": f"Expected columns {expected!r} but found {list(df.columns)}"
+            "message": f"Missing columns {missing}. Found: {list(df.columns)}"
         }
 
-    # 4) Build lookup dict
-    table = {code.strip(): desc for code, desc in zip(df["HSNCode"], df["Description"])}
+    # 5) Build lookup dict
+    table = {
+        str(code).strip(): str(desc).strip()
+        for code, desc in zip(df["HSNCode"], df["Description"])
+        if pd.notna(code)
+    }
 
-    # 5) Save into shared state
+    # 6) Store in shared state
     tool_context.state["hsn_table"] = table
-    return {"status": "success", "loaded_rows": len(table)}
 
-# load_hsn_master_tool = FunctionTool(
-#     func=load_hsn_master,
-#     name="load_hsn_master",
-#     description="Load the HSN master CSV (or XLSX) into memory (state['hsn_table'])."
-# )
+    return {"status": "success", "loaded_rows": len(table)}

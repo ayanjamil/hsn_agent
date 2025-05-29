@@ -2,7 +2,12 @@ from google.adk.agents import Agent
 
 DEFAULT_CORPUS = "testing"
 
-from hsn_agent.tools import create_corpus, list_corpora, delete_corpus, get_corpus_info
+from hsn_agent.tools import (
+    create_corpus,
+    list_corpora,
+    delete_corpus,
+    get_corpus_info,
+)
 from hsn_agent.tools.documents_handler.add_document import add_data
 from hsn_agent.tools.documents_handler.delete_document import delete_document
 from hsn_agent.tools.documents_handler.rag_query import rag_query
@@ -28,7 +33,7 @@ root_agent = Agent(
         # 📦 Assignment: HSN Code Validation and Suggestion Agent
 
         You are building an ADK‐based agent whose **primary** function is to validate Harmonized System Nomenclature (HSN) codes
-        and suggest codes based on product descriptions.  The agent uses a **master dataset** of HSN codes (2–8 digits) and
+        and suggest codes based on product descriptions. The agent uses a **master dataset** of HSN codes (2–8 digits) and
         their descriptions to perform:
 
         1. Format Validation  
@@ -37,11 +42,9 @@ root_agent = Agent(
         4. Suggestion Logic (from free‐text descriptions)
 
         ## Pipeline & Data Handling
-
-        - **Step 0**: _Load Master Data_  
-        Users must first call:
-            > load_hsn_master(path="/full/path/to/HSN_Master_Data.xlsx")  
-        This reads the Excel/CSV, normalizes headers, and stores a `dict[code→description]` in `tool_context.state["hsn_table"]`.
+        - **Lazy Master‐Data Load**  
+            The agent will automatically load `hsn_agent/data/master_hsn.csv` into memory the first time you ask it to validate an HSN code.  
+            No manual `load_hsn_master()` call is ever required.
 
         - **Corpus**  
         All RAG‐style, free‐text lookups (e.g. “horse for polo”) target a single corpus: **{DEFAULT_CORPUS}**.  
@@ -67,9 +70,9 @@ root_agent = Agent(
             > It sits under 01 (LIVE ANIMALS) → 0102 (LIVE BOVINE ANIMALS) → 010210 (LIVE BOVINE ANIMALS – BULLS).”
 
         1.5 **Partial-Code Pattern Queries**  
-            If the user says things like “ends with 99”, “begins with 123”, or “contains 333”  
-            you must call `rag_query(corpus_name="{DEFAULT_CORPUS}", query="<user_input>")`  
-            (our tool will detect the pattern and return up to 5 matching HSN codes).  
+        If the user says things like “ends with 99”, “begins with 123”, or “contains 333”  
+        you must call `rag_query(corpus_name="{DEFAULT_CORPUS}", query="<user_input>")`  
+        (our tool will detect the pattern and return up to 5 matching HSN codes).  
 
         2. **Free-Text Suggestions**  
         - For any natural-language query (e.g. “horse which can be used in polo”), call  
