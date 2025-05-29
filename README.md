@@ -90,6 +90,9 @@ graph TD
 - We can have the agent ask for feedback score 1-10 after each conversation and store it in database corrosponing to the chart id, and then use llm for analysing the top rated charts by the user for our understanding how to make conversation agent better.
 - We can also do a sentiment analysis of the charts in out database, if we don't have to take input from the user.
 
+### Updating HSN database without redeployment (future implementation approach)
+- Manager one seprate database for validation part and make a tool to update/add more HSN codes there. Add it in the agent as well and add instructions on how to handle document update. this tool will first update the database for validation and then update the vector data base for RAG approach. It is required to keep them separate because rag database is a vectorised database and is good for semantic quaries and is not that accurate for direct queries that is why we need one who can handle semantic and one who can handle exact codes and validation.
+
 ## 🛠️ Technology Stack
 
 - **Language**: Python 3.9+
