@@ -1,4 +1,4 @@
-
+Checkout this video of me explaining - https://drive.google.com/file/d/1W--y3hXUhWopfp_Vl1F2pc8-AWuSlrzJ/view?usp=sharing
 # HSN Code Validation & Suggestion Agent
 
 > An intelligent ADK-based agent for validating Harmonized System Nomenclature (HSN) codes and suggesting codes based on product or service descriptions using Google Cloud's Vertex AI.
